@@ -22,7 +22,7 @@ clean:
 	rm $(PARTS) *.cmxa *.cma *.cmi *.cmx *.a *.o *.cmo a.*
 
 docs: $(PARTS)
-	mkdir -p doc
+	test -d doc || mkdir -p doc
 	ocamldoc -t "Gearman Client Docs" -keep-code -colorize-code -d doc -html \
 		*.mli *.ml
 
