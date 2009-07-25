@@ -11,6 +11,7 @@
 type gearman_conn = {
     reader : in_channel;
     writer : out_channel;
+    funcs : (string, (string -> string)) Hashtbl.t
   }
 
 type gearman_res = {
@@ -23,3 +24,8 @@ val connect : string -> int -> gearman_conn
 val shutdown : gearman_conn -> unit
 
 val echo : gearman_conn -> string -> string
+
+val register : gearman_conn -> string -> (string -> string) -> unit
+
+val do_work : gearman_conn -> unit
+

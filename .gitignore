@@ -7,3 +7,4 @@
 *.cmx
 *~
 bin/echo
+bin/worker
