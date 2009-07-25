@@ -94,3 +94,7 @@ let rec do_work gm =
     10 -> do_pre_sleep gm; do_work gm
   | 11 -> dispatch gm res.data
   | _  -> assert (false)
+
+let rec work_forever gm =
+  do_work gm;
+  work_forever gm

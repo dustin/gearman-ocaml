@@ -12,14 +12,9 @@ let main () =
   Gearman.register gearman "uncapitalize" String.uncapitalize;
   Gearman.register gearman "escape" String.escaped;
 
-  (* Work for a bit *)
-  let rec loop n =
-    if (n > 0) then (
-      Gearman.do_work gearman;
-      Printf.printf "Did one job %d more to go\n%!" (n - 1);
-      loop (n - 1)) in
-  loop 10;
+  Gearman.work_forever gearman;
 
+  (* We never get here, but if we did, this is what we'd do *)
   Gearman.shutdown gearman
 ;;
 

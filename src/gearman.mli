@@ -29,3 +29,4 @@ val register : gearman_conn -> string -> (string -> string) -> unit
 
 val do_work : gearman_conn -> unit
 
+val work_forever : gearman_conn -> unit
