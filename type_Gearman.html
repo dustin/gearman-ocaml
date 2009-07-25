@@ -17,8 +17,8 @@
 &nbsp;&nbsp;<span class="keyword">type</span>&nbsp;gearman_res&nbsp;=&nbsp;{&nbsp;cmd&nbsp;:&nbsp;int;&nbsp;data&nbsp;:&nbsp;string;&nbsp;}<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;connect&nbsp;:&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Gearman</span>.gearman_conn<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;shutdown&nbsp;:&nbsp;<span class="constructor">Gearman</span>.gearman_conn&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;echo&nbsp;:&nbsp;<span class="constructor">Gearman</span>.gearman_conn&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;register&nbsp;:&nbsp;<span class="constructor">Gearman</span>.gearman_conn&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;(string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string)&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;do_work&nbsp;:&nbsp;<span class="constructor">Gearman</span>.gearman_conn&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;work_forever&nbsp;:&nbsp;<span class="constructor">Gearman</span>.gearman_conn&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;echo&nbsp;:&nbsp;<span class="constructor">Gearman</span>.gearman_conn&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string<br>
 <span class="keyword">end</span></code></body></html>

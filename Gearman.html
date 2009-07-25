@@ -11,6 +11,8 @@
 <link title="Gearman" rel="Chapter" href="Gearman.html"><link title="Data Types" rel="Section" href="#1_DataTypes">
 <link title="Functions" rel="Section" href="#1_Functions">
 <link title="Connection Management" rel="Subsection" href="#2_ConnectionManagement">
+<link title="Worker Functions" rel="Subsection" href="#2_WorkerFunctions">
+<link title="Miscellaneous" rel="Subsection" href="#2_Miscellaneous">
 <title>Gearman Client Docs : Gearman</title>
 </head>
 <body>
@@ -89,9 +91,9 @@ Connection to a gearman server.<br>
 <pre><span class="keyword">val</span> <a name="VALshutdown"></a><a href="code_VALGearman.shutdown.html">shutdown</a> : <code class="type"><a href="Gearman.html#TYPEgearman_conn">gearman_conn</a> -> unit</code></pre><div class="info">
 Shut down a connection to a gearman server.<br>
 </div>
-<pre><span class="keyword">val</span> <a name="VALecho"></a><a href="code_VALGearman.echo.html">echo</a> : <code class="type"><a href="Gearman.html#TYPEgearman_conn">gearman_conn</a> -> string -> string</code></pre><div class="info">
-Gearman echo request (returns its input)<br>
-</div>
+<br>
+<a name="2_WorkerFunctions"></a>
+<h2>Worker Functions</h2><br>
 <pre><span class="keyword">val</span> <a name="VALregister"></a><a href="code_VALGearman.register.html">register</a> : <code class="type"><a href="Gearman.html#TYPEgearman_conn">gearman_conn</a> -> string -> (string -> string) -> unit</code></pre><div class="info">
 Register a function with the gearman server.<br>
 </div>
@@ -101,5 +103,11 @@ Perform a single job.<br>
 </div>
 <pre><span class="keyword">val</span> <a name="VALwork_forever"></a><a href="code_VALGearman.work_forever.html">work_forever</a> : <code class="type"><a href="Gearman.html#TYPEgearman_conn">gearman_conn</a> -> unit</code></pre><div class="info">
 Loop forever performing jobs as they become available.<br>
+</div>
+<br>
+<a name="2_Miscellaneous"></a>
+<h2>Miscellaneous</h2><br>
+<pre><span class="keyword">val</span> <a name="VALecho"></a><a href="code_VALGearman.echo.html">echo</a> : <code class="type"><a href="Gearman.html#TYPEgearman_conn">gearman_conn</a> -> string -> string</code></pre><div class="info">
+Gearman echo request (returns its input)<br>
 </div>
 </body></html>
