@@ -1,0 +1,111 @@
+<html><head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Gearman" rel="Chapter" href="Gearman.html"><title>Gearman Client Docs : Gearman</title>
+</head>
+<body>
+<code class="code"><span class="comment">(*<br>
+&nbsp;*&nbsp;Copyright&nbsp;(c)&nbsp;2009&nbsp;&nbsp;Dustin&nbsp;Sallings&nbsp;&lt;dustin@spy.net&gt;<br>
+&nbsp;*)</span><br>
+<br>
+<span class="keyword">open</span>&nbsp;<span class="constructor">Unix</span><br>
+<br>
+<span class="comment">(*&nbsp;"\0RES"&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;res_magic&nbsp;=&nbsp;5391699<br>
+<span class="comment">(*&nbsp;"\0REQ"&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;req_magic&nbsp;=&nbsp;5391697<br>
+<br>
+<span class="keyword">let</span>&nbsp;echo_req&nbsp;=&nbsp;16<br>
+<span class="keyword">let</span>&nbsp;echo_res&nbsp;=&nbsp;17<br>
+<br>
+<span class="keyword">let</span>&nbsp;can_do&nbsp;=&nbsp;1<br>
+<span class="keyword">let</span>&nbsp;grab_job&nbsp;=&nbsp;9<br>
+<span class="keyword">let</span>&nbsp;no_job&nbsp;=&nbsp;10<br>
+<span class="keyword">let</span>&nbsp;job_assign&nbsp;=&nbsp;11<br>
+<span class="keyword">let</span>&nbsp;pre_sleep&nbsp;=&nbsp;4<br>
+<span class="keyword">let</span>&nbsp;noop&nbsp;=&nbsp;6<br>
+<span class="keyword">let</span>&nbsp;work_complete&nbsp;=&nbsp;13<br>
+<br>
+<span class="keyword">type</span>&nbsp;gearman_conn&nbsp;=&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;reader&nbsp;:&nbsp;in_channel;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;writer&nbsp;:&nbsp;out_channel;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;funcs&nbsp;:&nbsp;(string,&nbsp;(string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string))&nbsp;<span class="constructor">Hashtbl</span>.t<br>
+&nbsp;&nbsp;}<br>
+<br>
+<span class="keyword">type</span>&nbsp;gearman_res&nbsp;=&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cmd&nbsp;:&nbsp;int;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;data&nbsp;:&nbsp;string;<br>
+&nbsp;&nbsp;}<br>
+<br>
+<span class="keyword">let</span>&nbsp;connect&nbsp;hostname&nbsp;port&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;addr&nbsp;=&nbsp;<span class="constructor">ADDR_INET</span>&nbsp;((gethostbyname&nbsp;hostname).h_addr_list.(0),&nbsp;port)&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;stuff&nbsp;=&nbsp;open_connection&nbsp;addr&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;reader&nbsp;=&nbsp;fst&nbsp;stuff&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;writer&nbsp;=&nbsp;snd&nbsp;stuff&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;set_binary_mode_in&nbsp;reader&nbsp;<span class="keyword">true</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;set_binary_mode_out&nbsp;writer&nbsp;<span class="keyword">true</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;reader&nbsp;=&nbsp;reader;&nbsp;writer&nbsp;=&nbsp;writer;&nbsp;funcs&nbsp;=&nbsp;<span class="constructor">Hashtbl</span>.create&nbsp;1&nbsp;}<br>
+<br>
+<span class="keyword">let</span>&nbsp;shutdown&nbsp;gm&nbsp;=<br>
+&nbsp;&nbsp;shutdown_connection&nbsp;gm.reader<br>
+<br>
+<span class="keyword">let</span>&nbsp;send_cmd&nbsp;gm&nbsp;cmd&nbsp;data&nbsp;=<br>
+&nbsp;&nbsp;output_binary_int&nbsp;gm.writer&nbsp;req_magic;<br>
+&nbsp;&nbsp;output_binary_int&nbsp;gm.writer&nbsp;cmd;<br>
+&nbsp;&nbsp;output_binary_int&nbsp;gm.writer&nbsp;(<span class="constructor">String</span>.length&nbsp;data);<br>
+&nbsp;&nbsp;output_string&nbsp;gm.writer&nbsp;data;<br>
+&nbsp;&nbsp;flush&nbsp;gm.writer<br>
+<br>
+<span class="keyword">let</span>&nbsp;recv_response&nbsp;gm&nbsp;=<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;magic&nbsp;=&nbsp;input_binary_int&nbsp;gm.reader&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="keyword">assert</span>&nbsp;(magic&nbsp;=&nbsp;res_magic);<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;cmd&nbsp;=&nbsp;input_binary_int&nbsp;gm.reader&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;len&nbsp;=&nbsp;input_binary_int&nbsp;gm.reader&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;buf&nbsp;=&nbsp;<span class="constructor">String</span>.create&nbsp;len&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;really_input&nbsp;gm.reader&nbsp;buf&nbsp;0&nbsp;len;<br>
+&nbsp;&nbsp;{&nbsp;cmd&nbsp;=&nbsp;cmd;&nbsp;data&nbsp;=&nbsp;buf&nbsp;}<br>
+<br>
+<span class="keyword">let</span>&nbsp;echo&nbsp;gm&nbsp;data&nbsp;=<br>
+&nbsp;&nbsp;send_cmd&nbsp;gm&nbsp;echo_req&nbsp;data;<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;res&nbsp;=&nbsp;recv_response&nbsp;gm&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="keyword">assert</span>&nbsp;(res.cmd&nbsp;==&nbsp;echo_res);<br>
+&nbsp;&nbsp;res.data<br>
+<br>
+<span class="keyword">let</span>&nbsp;register&nbsp;gm&nbsp;name&nbsp;f&nbsp;=<br>
+&nbsp;&nbsp;<span class="constructor">Hashtbl</span>.replace&nbsp;gm.funcs&nbsp;name&nbsp;f;<br>
+&nbsp;&nbsp;send_cmd&nbsp;gm&nbsp;can_do&nbsp;name<br>
+<br>
+<span class="keyword">let</span>&nbsp;do_pre_sleep&nbsp;gm&nbsp;=<br>
+&nbsp;&nbsp;send_cmd&nbsp;gm&nbsp;pre_sleep&nbsp;<span class="string">""</span>;<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;res&nbsp;=&nbsp;recv_response&nbsp;gm&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="keyword">assert</span>&nbsp;(res.cmd&nbsp;==&nbsp;noop);<br>
+&nbsp;&nbsp;()<br>
+<br>
+<span class="keyword">let</span>&nbsp;dispatch&nbsp;gm&nbsp;data&nbsp;=<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;null&nbsp;=&nbsp;<span class="constructor">Char</span>.chr&nbsp;0&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;null_str&nbsp;=&nbsp;<span class="constructor">String</span>.make&nbsp;1&nbsp;null&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;first_null&nbsp;=&nbsp;<span class="constructor">String</span>.index&nbsp;data&nbsp;null&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;job_id&nbsp;=&nbsp;<span class="constructor">String</span>.sub&nbsp;data&nbsp;0&nbsp;first_null&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;second_null&nbsp;=&nbsp;<span class="constructor">String</span>.index_from&nbsp;data&nbsp;(first_null&nbsp;+&nbsp;1)&nbsp;null&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;fname&nbsp;=&nbsp;<span class="constructor">String</span>.sub&nbsp;data&nbsp;(first_null&nbsp;+&nbsp;1)&nbsp;(second_null&nbsp;-&nbsp;first_null&nbsp;-&nbsp;1)&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;job_data&nbsp;=&nbsp;<span class="constructor">String</span>.sub&nbsp;data&nbsp;(second_null&nbsp;+&nbsp;1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((<span class="constructor">String</span>.length&nbsp;data)&nbsp;-&nbsp;second_null&nbsp;-&nbsp;1)&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;func_res&nbsp;=&nbsp;(<span class="constructor">Hashtbl</span>.find&nbsp;gm.funcs&nbsp;fname)&nbsp;job_data&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;send_cmd&nbsp;gm&nbsp;work_complete&nbsp;(job_id&nbsp;^&nbsp;null_str&nbsp;^&nbsp;func_res)<br>
+<br>
+<span class="keyword">let</span>&nbsp;<span class="keyword">rec</span>&nbsp;do_work&nbsp;gm&nbsp;=<br>
+&nbsp;&nbsp;send_cmd&nbsp;gm&nbsp;grab_job&nbsp;<span class="string">""</span>;<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;res&nbsp;=&nbsp;recv_response&nbsp;gm&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="keyword">match</span>&nbsp;res.cmd&nbsp;<span class="keyword">with</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;10&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;do_pre_sleep&nbsp;gm;&nbsp;do_work&nbsp;gm<br>
+&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;11&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;dispatch&nbsp;gm&nbsp;res.data<br>
+&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;_&nbsp;&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keyword">assert</span>&nbsp;(<span class="keyword">false</span>)<br>
+<br>
+<span class="keyword">let</span>&nbsp;<span class="keyword">rec</span>&nbsp;work_forever&nbsp;gm&nbsp;=<br>
+&nbsp;&nbsp;do_work&nbsp;gm;<br>
+&nbsp;&nbsp;work_forever&nbsp;gm<br>
+</code></body></html>

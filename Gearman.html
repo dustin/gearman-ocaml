@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Gearman" rel="Chapter" href="Gearman.html"><link title="Data Types" rel="Section" href="#1_DataTypes">
+<link title="Functions" rel="Section" href="#1_Functions">
+<link title="Connection Management" rel="Subsection" href="#2_ConnectionManagement">
+<title>Gearman Client Docs : Gearman</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a href="index.html">Up</a>
+&nbsp;</div>
+<center><h1>Module <a href="type_Gearman.html">Gearman</a> (<a href="code_Gearman.html">.ml</a>)</h1></center>
+<br>
+<pre><span class="keyword">module</span> Gearman: <code class="code"><span class="keyword">sig</span></code> <a href="Gearman.html">..</a> <code class="code"><span class="keyword">end</span></code></pre>A gearman client for ocaml.
+<p>
+
+  <a href="http://gearman.org/"> http://gearman.org/</a><br>
+<hr width="100%">
+<br>
+<a name="1_DataTypes"></a>
+<h1>Data Types</h1><br>
+<br><code><span class="keyword">type</span> <a name="TYPEgearman_conn"></a><code class="type"></code>gearman_conn = {</code><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code>reader&nbsp;: <code class="type">Pervasives.in_channel</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code>writer&nbsp;: <code class="type">Pervasives.out_channel</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code>funcs&nbsp;: <code class="type">(string, string -> string) Hashtbl.t</code>;</code></td>
+
+</tr></table>
+}
+
+<div class="info">
+The connection to gearman<br>
+</div>
+
+<br><code><span class="keyword">type</span> <a name="TYPEgearman_res"></a><code class="type"></code>gearman_res = {</code><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code>cmd&nbsp;: <code class="type">int</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code>data&nbsp;: <code class="type">string</code>;</code></td>
+
+</tr></table>
+}
+
+<div class="info">
+A response from a gearman server<br>
+</div>
+
+<br>
+<a name="1_Functions"></a>
+<h1>Functions</h1><br>
+<br>
+<a name="2_ConnectionManagement"></a>
+<h2>Connection Management</h2><br>
+<pre><span class="keyword">val</span> <a name="VALconnect"></a><a href="code_VALGearman.connect.html">connect</a> : <code class="type">string -> int -> <a href="Gearman.html#TYPEgearman_conn">gearman_conn</a></code></pre><div class="info">
+Connection to a gearman server.<br>
+</div>
+<div class="param_info"><code class="code">hostname</code> : the server's hostname</div>
+<div class="param_info"><code class="code">port</code> : the port number on the server (typically 4730)</div>
+<pre><span class="keyword">val</span> <a name="VALshutdown"></a><a href="code_VALGearman.shutdown.html">shutdown</a> : <code class="type"><a href="Gearman.html#TYPEgearman_conn">gearman_conn</a> -> unit</code></pre><div class="info">
+Shut down a connection to a gearman server.<br>
+</div>
+<pre><span class="keyword">val</span> <a name="VALecho"></a><a href="code_VALGearman.echo.html">echo</a> : <code class="type"><a href="Gearman.html#TYPEgearman_conn">gearman_conn</a> -> string -> string</code></pre><div class="info">
+Gearman echo request (returns its input)<br>
+</div>
+<pre><span class="keyword">val</span> <a name="VALregister"></a><a href="code_VALGearman.register.html">register</a> : <code class="type"><a href="Gearman.html#TYPEgearman_conn">gearman_conn</a> -> string -> (string -> string) -> unit</code></pre><div class="info">
+Register a function with the gearman server.<br>
+</div>
+<div class="param_info"><code class="code">f</code> : a function that takes input of some sort and returns output</div>
+<pre><span class="keyword">val</span> <a name="VALdo_work"></a><a href="code_VALGearman.do_work.html">do_work</a> : <code class="type"><a href="Gearman.html#TYPEgearman_conn">gearman_conn</a> -> unit</code></pre><div class="info">
+Perform a single job.<br>
+</div>
+<pre><span class="keyword">val</span> <a name="VALwork_forever"></a><a href="code_VALGearman.work_forever.html">work_forever</a> : <code class="type"><a href="Gearman.html#TYPEgearman_conn">gearman_conn</a> -> unit</code></pre><div class="info">
+Loop forever performing jobs as they become available.<br>
+</div>
+</body></html>
