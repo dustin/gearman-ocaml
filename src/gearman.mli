@@ -38,8 +38,7 @@ val connect : string -> int -> gearman_conn
 (** Shut down a connection to a gearman server. *)
 val shutdown : gearman_conn -> unit
 
-(** Gearman echo request (returns its input) *)
-val echo : gearman_conn -> string -> string
+(** {2 Worker Functions} *)
 
 (**
    Register a function with the gearman server.
@@ -58,3 +57,8 @@ val do_work : gearman_conn -> unit
    Loop forever performing jobs as they become available.
 *)
 val work_forever : gearman_conn -> unit
+
+(** {2 Miscellaneous} *)
+
+(** Gearman echo request (returns its input) *)
+val echo : gearman_conn -> string -> string
