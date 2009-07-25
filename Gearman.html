@@ -97,6 +97,7 @@ Shut down a connection to a gearman server.<br>
 <pre><span class="keyword">val</span> <a name="VALregister"></a><a href="code_VALGearman.register.html">register</a> : <code class="type"><a href="Gearman.html#TYPEgearman_conn">gearman_conn</a> -> string -> (string -> string) -> unit</code></pre><div class="info">
 Register a function with the gearman server.<br>
 </div>
+<div class="param_info"><code class="code">name</code> : the name of the function to register</div>
 <div class="param_info"><code class="code">f</code> : a function that takes input of some sort and returns output</div>
 <pre><span class="keyword">val</span> <a name="VALdo_work"></a><a href="code_VALGearman.do_work.html">do_work</a> : <code class="type"><a href="Gearman.html#TYPEgearman_conn">gearman_conn</a> -> unit</code></pre><div class="info">
 Perform a single job.<br>
